@@ -1,8 +1,12 @@
 #pragma once
+#include <netinet/in.h>
 
 class SocketManager {
 public:
-    int createTcpSocket();
-    int createUdpSocket();
+    void init();
+    int getTcpSocket();
+    int getUdpSocket();
 
+private:
+    sockaddr_in serverAddress;
 };

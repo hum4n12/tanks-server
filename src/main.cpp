@@ -7,13 +7,13 @@
 
 std::atomic<bool> stop(false);
 
-// Funkcja obsługująca sygnał SIGTERM
 void signalHandler(int signal) {
     if (signal == SIGTERM) {
         std::cout << "Received SIGTERM. Exiting loop...\n";
         stop = true;
     }
 }
+
 
 int main() {
     using namespace std::literals::chrono_literals;
@@ -22,8 +22,15 @@ int main() {
     auto future = socket.listen();
 
     while (!stop) {
-         future.wait_for(100ms);
-
+        if (future.valid()) {
+            try {
+                std::string receivedData = future.get();
+                std::cout << "Received: " << receivedData << std::endl;
+                future = socket.listen();
+            } catch (const std::future_error& e) {
+                std::cerr << "Socket error: " << e.what() << "\n";
+            }
+        }
     }
     
     return 0;
